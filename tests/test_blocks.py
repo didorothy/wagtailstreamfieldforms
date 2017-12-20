@@ -6,6 +6,9 @@ from wagtailstreamfieldforms.blocks import (
     FormFieldBlockMixin,
     SingleLineFormFieldBlock,
     MultiLineFormFieldBlock,
+    EmailFormFieldBlock,
+    NumberFormFieldBlock,
+    UrlFormFieldBlock,
 )
 
 
@@ -99,3 +102,43 @@ class TestMultiLineFormFieldBlock(TestCase):
         self.assertIsInstance(field, forms.CharField)
         self.assertIsInstance(field.widget, forms.Textarea)
         self.assertEqual(field.initial, field_options['default_value'])
+
+
+class TestEmailFormFieldBlock(TestCase):
+
+    def test_create_field(self):
+        effb = EmailFormFieldBlock()
+        field_options = {
+            'label': 'Test Label',
+            'help_text': 'There is no help.',
+            'required': True,
+        }
+        field = effb.create_field(field_options)
+        self.assertIsInstance(field, forms.EmailField)
+
+
+class TestNumberFormFieldBlock(TestCase):
+
+    def test_create_field(self):
+        nffb = NumberFormFieldBlock()
+        field_options = {
+            'label': 'Test Label',
+            'help_text': 'There is no help.',
+            'required': True,
+        }
+        field = nffb.create_field(field_options)
+        self.assertIsInstance(field, forms.DecimalField)
+
+
+class TestUrlFormFieldBlock(TestCase):
+
+    def test_create_field(self):
+        uffb = UrlFormFieldBlock()
+        field_options = {
+            'label': 'Test Label',
+            'help_text': 'There is no help.',
+            'required': True,
+        }
+        field = uffb.create_field(field_options)
+        self.assertIsInstance(field, forms.URLField)
+
