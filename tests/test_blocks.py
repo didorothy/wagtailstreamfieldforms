@@ -2,7 +2,10 @@ from django import forms
 from django.test import TestCase
 
 
-from wagtailstreamfieldforms.blocks import FormFieldBlockMixin
+from wagtailstreamfieldforms.blocks import (
+    FormFieldBlockMixin,
+    SingleLineFormFieldBlock,
+)
 
 
 class TestFormFieldBlockMixin(TestCase):
@@ -38,4 +41,28 @@ class TestFormFieldBlockMixin(TestCase):
         ffbm = FormFieldBlockMixin()
         field_id = ffbm.clean_name({'label': 'This is A Test'})
         self.assertEqual('this-is-a-test', field_id)
+
+
+class TestSingleLineFormFieldBlock(TestCase):
+
+    def test_get_field_options(self):
+        slffb = SingleLineFormFieldBlock()
+        field_options = {
+            'label': 'Test Label',
+            'help_text': 'There is no help.',
+            'required': True,
+            'default_value': 'Test Value'
+        }
+        opts = slffb.get_field_options(field_options)
+        self.assertEqual(opts['label'], field_options['label'])
+        self.assertEqual(opts['help_text'], field_options['help_text'])
+        self.assertEqual(opts['required'], field_options['required'])
+        self.assertEqual(opts['initial'], field_options['default_value'])
+        self.assertEqual(opts['max_length'], 255)
+
+    def test_get_field_options_bad_options(self):
+        slffb = SingleLineFormFieldBlock()
+        with self.assertRaises(KeyError):
+            slffb.get_field_options({})
+
 
