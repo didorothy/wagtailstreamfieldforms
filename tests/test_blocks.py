@@ -10,6 +10,7 @@ from wagtailstreamfieldforms.blocks import (
     NumberFormFieldBlock,
     UrlFormFieldBlock,
     CheckboxFormFieldBlock,
+    DropdownFormFieldBlock,
 )
 
 
@@ -176,3 +177,44 @@ class TestCheckboxFormFieldBlock(TestCase):
         field = cffb.create_field(field_options)
         self.assertIsInstance(field, forms.BooleanField)
         self.assertEqual(field.initial, field_options['default_checked'])
+
+
+class TestDropDownFormFieldBlock(TestCase):
+
+    def test_get_field_options(self):
+        block = DropdownFormFieldBlock()
+        field_options = {
+            'label': 'Test Label',
+            'help_text': 'There is no help.',
+            'required': True,
+            'choices': [{'key': 'yes', 'description': 'Yes'}, {'key': 'no', 'description': 'No'}]
+        }
+        opts = block.get_field_options(field_options)
+        self.assertEqual(opts['label'], field_options['label'])
+        self.assertEqual(opts['help_text'], field_options['help_text'])
+        self.assertEqual(opts['required'], field_options['required'])
+        self.assertEqual(len(opts['choices']), len(field_options['choices']))
+        self.assertEqual(opts['choices'][0], (field_options['choices'][0]['key'], field_options['choices'][0]['description']))
+        self.assertEqual(opts['choices'][1], (field_options['choices'][1]['key'], field_options['choices'][1]['description']))
+
+
+    def test_get_field_options_bad_options(self):
+        block = DropdownFormFieldBlock()
+        with self.assertRaises(KeyError):
+            block.get_field_options({})
+
+    def test_create_field(self):
+        block = DropdownFormFieldBlock()
+        field_options = {
+            'label': 'Test Label',
+            'help_text': 'There is no help.',
+            'required': True,
+            'choices': [{'key': 'yes', 'description': 'Yes'}, {'key': 'no', 'description': 'No'}],
+            'allow_multiple_selections': True,
+        }
+        field = block.create_field(field_options)
+        self.assertIsInstance(field, forms.MultipleChoiceField)
+
+        field_options['allow_multiple_selections'] = False
+        field = block.create_field(field_options)
+        self.assertIsInstance(field, forms.ChoiceField)
