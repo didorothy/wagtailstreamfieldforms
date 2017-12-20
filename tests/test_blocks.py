@@ -9,6 +9,7 @@ from wagtailstreamfieldforms.blocks import (
     EmailFormFieldBlock,
     NumberFormFieldBlock,
     UrlFormFieldBlock,
+    CheckboxFormFieldBlock,
 )
 
 
@@ -142,3 +143,36 @@ class TestUrlFormFieldBlock(TestCase):
         field = uffb.create_field(field_options)
         self.assertIsInstance(field, forms.URLField)
 
+
+class TestCheckboxFormFieldBlock(TestCase):
+
+    def test_get_field_options(self):
+        cffb = CheckboxFormFieldBlock()
+        field_options = {
+            'label': 'Test Label',
+            'help_text': 'There is no help.',
+            'required': True,
+            'default_checked': True,
+        }
+        opts = cffb.get_field_options(field_options)
+        self.assertEqual(opts['label'], field_options['label'])
+        self.assertEqual(opts['help_text'], field_options['help_text'])
+        self.assertEqual(opts['required'], field_options['required'])
+        self.assertEqual(opts['initial'], field_options['default_checked'])
+
+    def test_get_field_options_bad_options(self):
+        cffb = CheckboxFormFieldBlock()
+        with self.assertRaises(KeyError):
+            cffb.get_field_options({})
+
+    def test_create_field(self):
+        cffb = CheckboxFormFieldBlock()
+        field_options = {
+            'label': 'Test Label',
+            'help_text': 'There is no help.',
+            'required': True,
+            'default_checked': True,
+        }
+        field = cffb.create_field(field_options)
+        self.assertIsInstance(field, forms.BooleanField)
+        self.assertEqual(field.initial, field_options['default_checked'])
