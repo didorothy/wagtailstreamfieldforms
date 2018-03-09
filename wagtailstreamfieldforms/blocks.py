@@ -162,4 +162,3 @@ class DateTimeFormFieldBlock(StructBlock, FormFieldBlockMixin):
     def create_field(self, field):
         options = self.get_field_options(field)
         return django.forms.DateTimeField(**options)
-

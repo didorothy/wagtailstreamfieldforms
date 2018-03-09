@@ -11,6 +11,9 @@ from wagtailstreamfieldforms.blocks import (
     UrlFormFieldBlock,
     CheckboxFormFieldBlock,
     DropdownFormFieldBlock,
+    RadioFormFieldBlock,
+    DateFormFieldBlock,
+    DateTimeFormFieldBlock,
 )
 
 
@@ -218,3 +221,57 @@ class TestDropDownFormFieldBlock(TestCase):
         field_options['allow_multiple_selections'] = False
         field = block.create_field(field_options)
         self.assertIsInstance(field, forms.ChoiceField)
+
+
+class TestRadioFormFieldBlock(TestCase):
+
+    def test_get_field_options(self):
+        block = RadioFormFieldBlock()
+        field_options = {
+            'label': 'Test Label',
+            'help_text': 'There is no help.',
+            'required': True,
+            'choices': [{'key': 'yes', 'description': 'Yes'}, {'key': 'no', 'description': 'No'}],
+        }
+        options = block.get_field_options(field_options)
+        self.assertEqual(len(options['choices']), len(field_options['choices']))
+        self.assertEqual(options['choices'][0][0], field_options['choices'][0]['key'])
+
+    def test_create_field(self):
+        block = RadioFormFieldBlock()
+        field_options = {
+            'label': 'Test Label',
+            'help_text': 'There is no help.',
+            'required': True,
+            'choices': [{'key': 'yes', 'description': 'Yes'}, {'key': 'no', 'description': 'No'}],
+        }
+        field = block.create_field(field_options)
+        self.assertIsInstance(field, forms.ChoiceField)
+
+
+class TestDateFormFieldBlock(TestCase):
+
+    def test_create_field(self):
+        block = DateFormFieldBlock()
+        field_options = {
+            'label': 'Test Label',
+            'help_text': 'There is no help.',
+            'required': True,
+        }
+        field = block.create_field(field_options)
+        self.assertIsInstance(field, forms.DateField)
+
+
+class TestDateTimeFormFieldBlock(TestCase):
+
+    def test_create_field(self):
+        block = DateTimeFormFieldBlock()
+        field_options = {
+            'label': 'Test Label',
+            'help_text': 'There is no help.',
+            'required': True,
+        }
+        field = block.create_field(field_options)
+        self.assertIsInstance(field, forms.DateTimeField)
+
+
