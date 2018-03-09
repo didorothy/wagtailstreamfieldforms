@@ -1,445 +1,262 @@
 # # -*- coding: utf-8 -*-
 # from __future__ import absolute_import, unicode_literals
 
-# import json
-
-# from django.core import mail
-# from django.test import TestCase
-
-# from wagtail.tests.testapp.models import CustomFormPageSubmission, FormField, JadeFormPage, StreamFormPage
-# from wagtail.tests.utils import WagtailTestUtils
-# from wagtail.wagtailcore.models import Page
-# from wagtail.wagtailforms.models import FormSubmission, FakeManager
-# from wagtail.wagtailforms.tests.utils import make_form_page, make_form_page_with_custom_submission
-
-
-# class TestFormSubmission(TestCase):
-#     def setUp(self):
-#         # Create a form page
-#         self.form_page = make_form_page()
-
-#     def test_get_form(self):
-#         response = self.client.get('/contact-us/')
-
-#         # Check response
-#         self.assertContains(response, """<label for="id_your-email">Your email</label>""")
-#         self.assertTemplateUsed(response, 'tests/form_page.html')
-#         self.assertTemplateNotUsed(response, 'tests/form_page_landing.html')
-
-#         # check that variables defined in get_context are passed through to the template (#1429)
-#         self.assertContains(response, "<p>hello world</p>")
-
-#     def test_post_invalid_form(self):
-#         response = self.client.post('/contact-us/', {
-#             'your-email': 'bob',
-#             'your-message': 'hello world',
-#             'your-choices': ''
-#         })
-
-#         # Check response
-#         self.assertContains(response, "Enter a valid email address.")
-#         self.assertTemplateUsed(response, 'tests/form_page.html')
-#         self.assertTemplateNotUsed(response, 'tests/form_page_landing.html')
-
-#     def test_post_valid_form(self):
-#         response = self.client.post('/contact-us/', {
-#             'your-email': 'bob@example.com',
-#             'your-message': 'hello world',
-#             'your-choices': {'foo': '', 'bar': '', 'baz': ''}
-#         })
-
-#         # Check response
-#         self.assertContains(response, "Thank you for your feedback.")
-#         self.assertTemplateNotUsed(response, 'tests/form_page.html')
-#         self.assertTemplateUsed(response, 'tests/form_page_landing.html')
-
-#         # check that variables defined in get_context are passed through to the template (#1429)
-#         self.assertContains(response, "<p>hello world</p>")
-
-#         # Check that an email was sent
-#         self.assertEqual(len(mail.outbox), 1)
-#         self.assertEqual(mail.outbox[0].subject, "The subject")
-#         self.assertIn("Your message: hello world", mail.outbox[0].body)
-#         self.assertEqual(mail.outbox[0].to, ['to@email.com'])
-#         self.assertEqual(mail.outbox[0].from_email, 'from@email.com')
-
-#         # Check that form submission was saved correctly
-#         form_page = Page.objects.get(url_path='/home/contact-us/')
-#         self.assertTrue(FormSubmission.objects.filter(page=form_page, form_data__contains='hello world').exists())
-
-#     def test_post_unicode_characters(self):
-#         self.client.post('/contact-us/', {
-#             'your-email': 'bob@example.com',
-#             'your-message': 'こんにちは、世界',
-#             'your-choices': {'foo': '', 'bar': '', 'baz': ''}
-#         })
-
-#         # Check the email
-#         self.assertEqual(len(mail.outbox), 1)
-#         self.assertIn("Your message: こんにちは、世界", mail.outbox[0].body)
-
-#         # Check the form submission
-#         submission = FormSubmission.objects.get()
-#         submission_data = json.loads(submission.form_data)
-#         self.assertEqual(submission_data['your-message'], 'こんにちは、世界')
-
-#     def test_post_multiple_values(self):
-#         response = self.client.post('/contact-us/', {
-#             'your-email': 'bob@example.com',
-#             'your-message': 'hello world',
-#             'your-choices': {'foo': 'on', 'bar': 'on', 'baz': 'on'}
-#         })
-
-#         # Check response
-#         self.assertContains(response, "Thank you for your feedback.")
-#         self.assertTemplateNotUsed(response, 'tests/form_page.html')
-#         self.assertTemplateUsed(response, 'tests/form_page_landing.html')
-
-#         # Check that the three checkbox values were saved correctly
-#         form_page = Page.objects.get(url_path='/home/contact-us/')
-#         submission = FormSubmission.objects.filter(
-#             page=form_page, form_data__contains='hello world'
-#         )
-#         self.assertIn("foo", submission[0].form_data)
-#         self.assertIn("bar", submission[0].form_data)
-#         self.assertIn("baz", submission[0].form_data)
-
-#         # Check that the all the multiple checkbox values are serialised in the
-#         # email correctly
-#         self.assertEqual(len(mail.outbox), 1)
-#         self.assertIn("bar", mail.outbox[0].body)
-#         self.assertIn("foo", mail.outbox[0].body)
-#         self.assertIn("baz", mail.outbox[0].body)
-
-#     def test_post_blank_checkbox(self):
-#         response = self.client.post('/contact-us/', {
-#             'your-email': 'bob@example.com',
-#             'your-message': 'hello world',
-#             'your-choices': {},
-#         })
-
-#         # Check response
-#         self.assertContains(response, "Thank you for your feedback.")
-#         self.assertTemplateNotUsed(response, 'tests/form_page.html')
-#         self.assertTemplateUsed(response, 'tests/form_page_landing.html')
-
-#         # Check that the checkbox was serialised in the email correctly
-#         self.assertEqual(len(mail.outbox), 1)
-#         self.assertIn("Your choices: ", mail.outbox[0].body)
-
-
-# class TestFormWithCustomSubmission(TestCase, WagtailTestUtils):
-#     def setUp(self):
-#         # Create a form page
-#         self.form_page = make_form_page_with_custom_submission()
-
-#         self.user = self.login()
-
-#     def test_get_form(self):
-#         response = self.client.get('/contact-us/')
-
-#         # Check response
-#         self.assertContains(response, """<label for="id_your-email">Your email</label>""")
-#         self.assertTemplateUsed(response, 'tests/form_page_with_custom_submission.html')
-#         self.assertTemplateNotUsed(response, 'tests/form_page_with_custom_submission_landing.html')
-#         self.assertNotContains(response, '<div>You must log in first.</div>', html=True)
-#         self.assertContains(response, '<p>Boring intro text</p>', html=True)
-
-#         # check that variables defined in get_context are passed through to the template (#1429)
-#         self.assertContains(response, "<p>hello world</p>")
-
-#     def test_get_form_with_anonymous_user(self):
-#         self.client.logout()
-
-#         response = self.client.get('/contact-us/')
-
-#         # Check response
-#         self.assertNotContains(response, """<label for="id_your-email">Your email</label>""")
-#         self.assertTemplateUsed(response, 'tests/form_page_with_custom_submission.html')
-#         self.assertTemplateNotUsed(response, 'tests/form_page_with_custom_submission_landing.html')
-#         self.assertContains(response, '<div>You must log in first.</div>', html=True)
-#         self.assertNotContains(response, '<p>Boring intro text</p>', html=True)
-
-#         # check that variables defined in get_context are passed through to the template (#1429)
-#         self.assertContains(response, "<p>hello world</p>")
-
-#     def test_post_invalid_form(self):
-#         response = self.client.post('/contact-us/', {
-#             'your-email': 'bob',
-#             'your-message': 'hello world',
-#             'your-choices': ''
-#         })
-
-#         # Check response
-#         self.assertContains(response, "Enter a valid email address.")
-#         self.assertTemplateUsed(response, 'tests/form_page_with_custom_submission.html')
-#         self.assertTemplateNotUsed(response, 'tests/form_page_with_custom_submission_landing.html')
-
-#     def test_post_valid_form(self):
-#         response = self.client.post('/contact-us/', {
-#             'your-email': 'bob@example.com',
-#             'your-message': 'hello world',
-#             'your-choices': {'foo': '', 'bar': '', 'baz': ''}
-#         })
-
-#         # Check response
-#         self.assertContains(response, "Thank you for your patience!")
-#         self.assertTemplateNotUsed(response, 'tests/form_page_with_custom_submission.html')
-#         self.assertTemplateUsed(response, 'tests/form_page_with_custom_submission_landing.html')
-
-#         # check that variables defined in get_context are passed through to the template (#1429)
-#         self.assertContains(response, "<p>hello world</p>")
-
-#         # Check that an email was sent
-#         self.assertEqual(len(mail.outbox), 1)
-#         self.assertEqual(mail.outbox[0].subject, "The subject")
-#         self.assertIn("Your message: hello world", mail.outbox[0].body)
-#         self.assertEqual(mail.outbox[0].to, ['to@email.com'])
-#         self.assertEqual(mail.outbox[0].from_email, 'from@email.com')
-
-#         # Check that form submission was saved correctly
-#         form_page = Page.objects.get(url_path='/home/contact-us/')
-#         self.assertTrue(CustomFormPageSubmission.objects.filter(page=form_page, form_data__contains='hello world').exists())
-
-#     def test_post_form_twice(self):
-#         # First submission
-#         response = self.client.post('/contact-us/', {
-#             'your-email': 'bob@example.com',
-#             'your-message': 'hello world',
-#             'your-choices': {'foo': '', 'bar': '', 'baz': ''}
-#         })
-
-#         # Check response
-#         self.assertTemplateNotUsed(response, 'tests/form_page_with_custom_submission.html')
-#         self.assertTemplateUsed(response, 'tests/form_page_with_custom_submission_landing.html')
-#         self.assertContains(response, '<p>Thank you for your patience!</p>', html=True)
-#         self.assertNotContains(response, '<div>The form is already filled.</div>', html=True)
-
-#         # Check that first form submission was saved correctly
-#         submissions_qs = CustomFormPageSubmission.objects.filter(user=self.user, page=self.form_page)
-#         self.assertEqual(submissions_qs.count(), 1)
-#         self.assertTrue(submissions_qs.filter(form_data__contains='hello world').exists())
-
-#         # Second submission
-#         response = self.client.post('/contact-us/', {
-#             'your-email': 'bob@example.com',
-#             'your-message': 'hello world',
-#             'your-choices': {'foo': '', 'bar': '', 'baz': ''}
-#         })
-
-#         # Check response
-#         self.assertTemplateUsed(response, 'tests/form_page_with_custom_submission.html')
-#         self.assertTemplateNotUsed(response, 'tests/form_page_with_custom_submission_landing.html')
-#         self.assertNotContains(response, '<p>Thank you for your patience!</p>', html=True)
-#         self.assertContains(response, '<div>The form is already filled.</div>', html=True)
-#         self.assertNotContains(response, '<div>You must log in first.</div>', html=True)
-#         self.assertNotContains(response, '<p>Boring intro text</p>', html=True)
-
-#         # Check that first submission exists and second submission wasn't saved
-#         submissions_qs = CustomFormPageSubmission.objects.filter(user=self.user, page=self.form_page)
-#         self.assertEqual(submissions_qs.count(), 1)
-#         self.assertTrue(submissions_qs.filter(form_data__contains='hello world').exists())
-#         self.assertFalse(submissions_qs.filter(form_data__contains='hello cruel world').exists())
-
-#     def test_post_unicode_characters(self):
-#         self.client.post('/contact-us/', {
-#             'your-email': 'bob@example.com',
-#             'your-message': 'こんにちは、世界',
-#             'your-choices': {'foo': '', 'bar': '', 'baz': ''}
-#         })
-
-#         # Check the email
-#         self.assertEqual(len(mail.outbox), 1)
-#         self.assertIn("Your message: こんにちは、世界", mail.outbox[0].body)
-
-#         # Check the form submission
-#         submission = CustomFormPageSubmission.objects.get()
-#         submission_data = json.loads(submission.form_data)
-#         self.assertEqual(submission_data['your-message'], 'こんにちは、世界')
-
-#     def test_post_multiple_values(self):
-#         response = self.client.post('/contact-us/', {
-#             'your-email': 'bob@example.com',
-#             'your-message': 'hello world',
-#             'your-choices': {'foo': 'on', 'bar': 'on', 'baz': 'on'}
-#         })
-
-#         # Check response
-#         self.assertContains(response, "Thank you for your patience!")
-#         self.assertTemplateNotUsed(response, 'tests/form_page_with_custom_submission.html')
-#         self.assertTemplateUsed(response, 'tests/form_page_with_custom_submission_landing.html')
-
-#         # Check that the three checkbox values were saved correctly
-#         form_page = Page.objects.get(url_path='/home/contact-us/')
-#         submission = CustomFormPageSubmission.objects.filter(
-#             page=form_page, form_data__contains='hello world'
-#         )
-#         self.assertIn("foo", submission[0].form_data)
-#         self.assertIn("bar", submission[0].form_data)
-#         self.assertIn("baz", submission[0].form_data)
-
-#     def test_post_blank_checkbox(self):
-#         response = self.client.post('/contact-us/', {
-#             'your-email': 'bob@example.com',
-#             'your-message': 'hello world',
-#             'your-choices': {},
-#         })
-
-#         # Check response
-#         self.assertContains(response, "Thank you for your patience!")
-#         self.assertTemplateNotUsed(response, 'tests/form_page_with_custom_submission.html')
-#         self.assertTemplateUsed(response, 'tests/form_page_with_custom_submission_landing.html')
-
-#         # Check that the checkbox was serialised in the email correctly
-#         self.assertEqual(len(mail.outbox), 1)
-#         self.assertIn("Your choices: None", mail.outbox[0].body)
-
-
-# class TestFormSubmissionWithMultipleRecipients(TestCase):
-#     def setUp(self):
-#         # Create a form page
-#         self.form_page = make_form_page(to_address='to@email.com, another@email.com')
-
-#     def test_post_valid_form(self):
-#         response = self.client.post('/contact-us/', {
-#             'your-email': 'bob@example.com',
-#             'your-message': 'hello world',
-#             'your-choices': {'foo': '', 'bar': '', 'baz': ''}
-#         })
-
-#         # Check response
-#         self.assertContains(response, "Thank you for your feedback.")
-#         self.assertTemplateNotUsed(response, 'tests/form_page.html')
-#         self.assertTemplateUsed(response, 'tests/form_page_landing.html')
-
-#         # check that variables defined in get_context are passed through to the template (#1429)
-#         self.assertContains(response, "<p>hello world</p>")
-
-#         # Check that one email was sent, but to two recipients
-#         self.assertEqual(len(mail.outbox), 1)
-
-#         self.assertEqual(mail.outbox[0].subject, "The subject")
-#         self.assertIn("Your message: hello world", mail.outbox[0].body)
-#         self.assertEqual(mail.outbox[0].from_email, 'from@email.com')
-#         self.assertEqual(set(mail.outbox[0].to), {'to@email.com', 'another@email.com'})
-
-#         # Check that form submission was saved correctly
-#         form_page = Page.objects.get(url_path='/home/contact-us/')
-#         self.assertTrue(FormSubmission.objects.filter(page=form_page, form_data__contains='hello world').exists())
-
-
-# class TestFormSubmissionWithMultipleRecipientsAndWithCustomSubmission(TestCase, WagtailTestUtils):
-#     def setUp(self):
-#         # Create a form page
-#         self.form_page = make_form_page_with_custom_submission(
-#             to_address='to@email.com, another@email.com'
-#         )
-
-#         self.user = self.login()
-
-#     def test_post_valid_form(self):
-#         response = self.client.post('/contact-us/', {
-#             'your-email': 'bob@example.com',
-#             'your-message': 'hello world',
-#             'your-choices': {'foo': '', 'bar': '', 'baz': ''}
-#         })
-
-#         # Check response
-#         self.assertContains(response, "Thank you for your patience!")
-#         self.assertTemplateNotUsed(response, 'tests/form_page_with_custom_submission.html')
-#         self.assertTemplateUsed(response, 'tests/form_page_with_custom_submission_landing.html')
-
-#         # check that variables defined in get_context are passed through to the template (#1429)
-#         self.assertContains(response, "<p>hello world</p>")
-
-#         # Check that one email was sent, but to two recipients
-#         self.assertEqual(len(mail.outbox), 1)
-
-#         self.assertEqual(mail.outbox[0].subject, "The subject")
-#         self.assertIn("Your message: hello world", mail.outbox[0].body)
-#         self.assertEqual(mail.outbox[0].from_email, 'from@email.com')
-#         self.assertEqual(set(mail.outbox[0].to), {'to@email.com', 'another@email.com'})
-
-#         # Check that form submission was saved correctly
-#         form_page = Page.objects.get(url_path='/home/contact-us/')
-#         self.assertTrue(
-#             CustomFormPageSubmission.objects.filter(page=form_page, form_data__contains='hello world').exists()
-#         )
-
-
-# class TestIssue798(TestCase):
-#     fixtures = ['test.json']
-
-#     def setUp(self):
-#         self.assertTrue(self.client.login(username='siteeditor', password='password'))
-#         self.form_page = Page.objects.get(url_path='/home/contact-us/').specific
-
-#         # Add a number field to the page
-#         FormField.objects.create(
-#             page=self.form_page,
-#             label="Your favourite number",
-#             field_type='number',
-#         )
-
-#     def test_post(self):
-#         response = self.client.post('/contact-us/', {
-#             'your-email': 'bob@example.com',
-#             'your-message': 'hello world',
-#             'your-choices': {'foo': '', 'bar': '', 'baz': ''},
-#             'your-favourite-number': '7.3',
-#         })
-
-#         # Check response
-#         self.assertTemplateUsed(response, 'tests/form_page_landing.html')
-
-#         # Check that form submission was saved correctly
-#         self.assertTrue(FormSubmission.objects.filter(page=self.form_page, form_data__contains='7.3').exists())
-
-
-# class TestNonHtmlExtension(TestCase):
-#     fixtures = ['test.json']
-
-#     def test_non_html_extension(self):
-#         form_page = JadeFormPage(title="test")
-#         self.assertEqual(form_page.landing_page_template, "tests/form_page_landing.jade")
-
-
-# class TestFakeManager(TestCase):
-#     def test_init_with_wrong_type(self):
-#         with self.assertRaises(ValueError):
-#             FakeManager(None)
-
-#         class TestClass(object):
-#             pass
-
-#         with self.assertRaises(ValueError):
-#             FakeManager(TestClass())
-
-#     def test_init_with_page(self):
-#         root_page = Page.objects.get(id=1)
-
-#         # try a page that does not have a specific class that inherits from AbstractForm
-#         with self.assertRaises(ValueError):
-#             FakeManager(root_page)
-
-#         page = StreamFormPage()
-#         FakeManager(page)
-#         # TODO: find a way to test when we have a Page object that has a Page.specific of AbstractForm
-
-#     def test_all(self):
-#         page = StreamFormPage(body='''[
-#             {
-#                 "type": "field",
-#                 "value": {
-#                     "required": true,
-#                     "default_value": "",
-#                     "field_type": "singleline",
-#                     "label": "Name",
-#                     "choices": "",
-#                     "help_text": ""
-#                 }
-#             }
-#         ]''')
-#         manager = FakeManager(page)
-#         records = manager.all()
-#         self.assertEqual(len(records), 1)
+import json
+
+from django.test import TestCase
+from wagtail.wagtailcore.blocks import CharBlock, ListBlock, RichTextBlock, StreamBlock, StructBlock
+
+from wagtailstreamfieldforms.blocks import *
+from wagtailstreamfieldforms.models import FormFieldFinder
+
+
+class TestFormFieldFinder(TestCase):
+    def test_simple_case(self):
+        # create a StreamBlock and pass a value in to to_python
+        class TestBlock(StreamBlock):
+            field = SingleLineFormFieldBlock(icon='placeholder')
+            p = CharBlock()
+
+        value = TestBlock().to_python([{
+            'type': 'field',
+            'value': {
+                "required": True,
+                "default_value": "",
+                "label": "Name",
+                "help_text": ""
+            }
+        }, {
+            'type': 'p',
+            'value': 'A test',
+        }, {
+            'type': 'field',
+            'value': {
+                "required": False,
+                "default_value": "",
+                "label": "Description",
+                "help_text": ""
+            }
+        }])
+
+        finder = FormFieldFinder()
+
+        fields = finder.find_form_fields(TestBlock(), value)
+
+        self.assertEqual(len(fields), 2)
+        self.assertIsInstance(fields[0].block, SingleLineFormFieldBlock)
+        self.assertIsInstance(fields[1].block, SingleLineFormFieldBlock)
+
+        self.assertEqual(fields[0].value["label"], 'Name')
+        self.assertEqual(fields[1].value["label"], 'Description')
+
+    def test_nested_form_fields(self):
+        class TestStructBlock(StructBlock):
+            title = CharBlock()
+            description = CharBlock()
+            field = SingleLineFormFieldBlock()
+
+
+        class TestBlock(StreamBlock):
+            field = SingleLineFormFieldBlock(icon='placeholder')
+            p = CharBlock()
+            special = TestStructBlock()
+            list = ListBlock(SingleLineFormFieldBlock(label='Field'))
+            stream = StreamBlock([('field', SingleLineFormFieldBlock()), ('p', CharBlock())])
+
+        value = TestBlock().to_python([{
+            'type': 'field',
+            'value': {
+                "required": True,
+                "default_value": "",
+                "label": "Name",
+                "help_text": ""
+            }
+        }, {
+            'type': 'p',
+            'value': 'A test',
+        }, {
+            'type': 'field',
+            'value': {
+                "required": False,
+                "default_value": "",
+                "label": "Description",
+                "help_text": ""
+            }
+        }, {
+            'type': 'special',
+            'value': {
+                'title': 'A Test Special',
+                'description': 'A longer description of the test special.',
+                'field': {
+                    "required": True,
+                    "default_value": "",
+                    "label": "Book Name",
+                    "help_text": ""
+                }
+            }
+        }, {
+            'type': 'list',
+            'value': [
+                {
+                    "required": True,
+                    "default_value": "",
+                    "label": "Field Four",
+                    "help_text": ""
+                }, {
+                    "required": True,
+                    "default_value": "",
+                    "label": "Field Five",
+                    "help_text": ""
+                }
+            ]
+        }, {
+            'type': 'stream',
+            'value': [
+                {
+                    'type': 'p',
+                    'value': 'A test paragraph'
+                },
+                {
+                    'type': 'field',
+                    'value': {
+                        "required": True,
+                        "default_value": "",
+                        "label": "Field Six",
+                        "help_text": ""
+                    }
+                }
+            ]
+        }])
+
+        finder = FormFieldFinder()
+
+        fields = finder.find_form_fields(TestBlock(), value)
+
+        self.assertEqual(len(fields), 6)
+        self.assertIsInstance(fields[0].block, SingleLineFormFieldBlock)
+        self.assertIsInstance(fields[1].block, SingleLineFormFieldBlock)
+        self.assertIsInstance(fields[2].block, SingleLineFormFieldBlock)
+        self.assertIsInstance(fields[3].block, SingleLineFormFieldBlock)
+        self.assertIsInstance(fields[4].block, SingleLineFormFieldBlock)
+        self.assertIsInstance(fields[5].block, SingleLineFormFieldBlock)
+        self.assertEqual(fields[0].value["label"], 'Name')
+        self.assertEqual(fields[1].value["label"], 'Description')
+        self.assertEqual(fields[2].value["label"], 'Book Name')
+        self.assertEqual(fields[3].value["label"], 'Field Four')
+        self.assertEqual(fields[4].value["label"], 'Field Five')
+        self.assertEqual(fields[5].value["label"], 'Field Six')
+
+    def test_complex_form_fields(self):
+        TestBlock = StreamBlock([
+            ('h2', CharBlock()),
+            ('h3', CharBlock()),
+            ('p', RichTextBlock()),
+            ('singlelinefield', SingleLineFormFieldBlock()),
+            ('multilinefield', MultiLineFormFieldBlock()),
+            ('emailfield', EmailFormFieldBlock()),
+            ('numberfield', NumberFormFieldBlock()),
+            ('urlfield', UrlFormFieldBlock()),
+            ('checkboxfield', CheckboxFormFieldBlock()),
+            ('dropdownfield', DropdownFormFieldBlock()),
+            ('radiofield', RadioFormFieldBlock()),
+            ('datefield', DateFormFieldBlock()),
+            ('datetimefield', DateTimeFormFieldBlock()),
+        ])
+
+        value = TestBlock.to_python(json.loads('''\
+[{
+    "value": {
+        "choices": [{
+            "description": "Black",
+            "key": "black"
+        }, {
+            "description": "Blue",
+            "key": "blue"
+        }, {
+            "description": "Green",
+            "key": "green"
+        }, {
+            "description": "Orange",
+            "key": "orange"
+        }, {
+            "description": "Red",
+            "key": "red"
+        }, {
+            "description": "White",
+            "key": "white"
+        }, {
+            "description": "Yellow",
+            "key": "yellow"
+        }],
+        "label": "What is your favorite color?",
+        "required": true,
+        "allow_multiple_selections": false,
+        "help_text": "Choose your favorite color from the list below."
+    },
+    "type": "dropdownfield"
+}, {
+    "value": {
+        "label": "What animal comes to mind when you think of your favorite color?",
+        "default_value": "",
+        "required": true,
+        "help_text": "Don't think really hard. First animal that comes to mind."
+    },
+    "type": "singlelinefield"
+}, {
+    "value": {
+        "label": "Why is this your favorite color?",
+        "default_value": "",
+        "required": false,
+        "help_text": "Give us two to three sentences that describe why you like this color."
+    },
+    "type": "multilinefield"
+}, {
+    "value": {
+        "choices": [{
+            "description": "Female",
+            "key": "female"
+        }, {
+            "description": "Male",
+            "key": "male"
+        }],
+        "label": "Gender",
+        "required": false,
+        "help_text": "Are you male or female?"
+    },
+    "type": "radiofield"
+}, {
+    "value": {
+        "label": "When is your birthday.",
+        "required": false,
+        "help_text": "This helps us correlate favorite colors by birth month."
+    },
+    "type": "datefield"
+}, {
+    "value": {
+        "label": "Can we share your answers?",
+        "default_checked": true,
+        "required": false,
+        "help_text": "If you check this box we will share your responses anonymously with everyone that comes to our website."
+    },
+    "type": "checkboxfield"
+}]'''))
+
+        finder = FormFieldFinder()
+
+        fields = finder.find_form_fields(TestBlock, value)
+
+        self.assertEqual(len(fields), 6)
+        self.assertIsInstance(fields[0].block, DropdownFormFieldBlock)
+        self.assertIsInstance(fields[1].block, SingleLineFormFieldBlock)
+        self.assertIsInstance(fields[2].block, MultiLineFormFieldBlock)
+        self.assertIsInstance(fields[3].block, RadioFormFieldBlock)
+        self.assertIsInstance(fields[4].block, DateFormFieldBlock)
+        self.assertIsInstance(fields[5].block, CheckboxFormFieldBlock)
+
+        self.assertEqual(fields[0].value["label"], 'What is your favorite color?')
+        self.assertEqual(fields[1].value["label"], 'What animal comes to mind when you think of your favorite color?')
+        self.assertEqual(fields[2].value["label"], 'Why is this your favorite color?')
+        self.assertEqual(fields[3].value["label"], 'Gender')
+        self.assertEqual(fields[4].value["label"], 'When is your birthday.')
+        self.assertEqual(fields[5].value["label"], 'Can we share your answers?')
+

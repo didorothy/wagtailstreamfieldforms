@@ -1,7 +1,10 @@
+import json
 import os.path
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.serializers.json import DjangoJSONEncoder
+from django.shortcuts import render
 
 from wagtail.wagtailcore.blocks import ListBlock, StreamBlock, StructBlock
 from wagtail.wagtailcore.fields import StreamField
@@ -29,13 +32,9 @@ class SubmissionField(models.Model):
     submission = models.ForeignKey(Submission, on_delete=models.CASCADE)
     field_name = models.CharField(max_length=255)
     field_value = models.TextField(blank=True)
-    field_type = models.CharField(max_length=50, blank=True)
 
     def __str__(self):
         return '{0}: {1}'.format(self.field_name, self.field_value)
-
-
-
 
 
 class FormFieldFinder(object):
@@ -115,6 +114,7 @@ class FormFieldFinder(object):
 
 
 class AbstractFormPage(Page):
+    '''The base class for all Pages that will have a StreamField based form on them.'''
 
     def __init__(self, *args, **kwargs):
         super(AbstractFormPage, self).__init__(*args, **kwargs)
@@ -125,13 +125,20 @@ class AbstractFormPage(Page):
     class Meta:
         abstract = True
 
+    def get_form_submitted_template(self, request, *args, **kwargs):
+        '''Returns the name of the submitted template.'''
+        return self.form_submitted_template
+
     def get_form_field_finder(self):
+        '''Return the FormFieldFinder instance to use to find form fields in a StreamField.'''
         return FormFieldFinder()
 
     def get_form_builder(self):
+        '''Return the FormBuilder instance used to create the form class.'''
         return FormBuilder(self.get_form_fields())
 
     def get_form_fields(self):
+        '''Finds form fields in all StreamField instances of every database field for this Page record.'''
         finder = self.get_form_field_finder()
         form_fields = []
         for field in self.__class__._meta.get_fields():
@@ -140,9 +147,16 @@ class AbstractFormPage(Page):
         return form_fields
 
     def get_form_class(self):
+        '''Creates and returns the Form class to use for managing the dyanmic form on this page.'''
         return self.get_form_builder().get_form_class()
 
+    def get_form(self, form_data=None, file_data=None, **kwargs):
+        '''Returns the form instance to use for this Page.'''
+        form_cls = self.get_form_class()
+        return form_cls(form_data, file_data, **kwargs)
+
     def process_form_submission(self, form):
+        '''Handles the storing of information for a valid form submission.'''
         sub = Submission()
         sub.page = self
         sub.save()
@@ -150,6 +164,29 @@ class AbstractFormPage(Page):
             sub_field = SubmissionField()
             sub_field.submission = sub
             sub_field.field_name = key
-            sub_field.field_value = form.cleaned_data[key]
-            sub_field.field_type = None # oops bad.
+            sub_field.field_value = json.dumps(form.cleaned_data[key], cls=DjangoJSONEncoder)
+            sub_field.save()
 
+    def get_context(self, request, *args, **kwargs):
+        '''Builds and returns the rendering context for rendering a template.'''
+        context = super(AbstractFormPage, self).get_context(request)
+        if request.method == 'POST':
+            form = self.get_form(request.POST, request.FILES, page=self, user=request.user)
+        else:
+            form = self.get_form(None, None)
+        context.update({
+            'form': form,
+        })
+        return context
+
+    def serve(self, request, *args, **kwargs):
+        '''Handles serving the Page on the front-end of the website.'''
+        context = self.get_context(request)
+        if request.method == 'POST':
+            form = context['form']
+            if form.is_valid():
+                self.process_form_submission(form)
+
+                return render(request, self.get_form_submitted_template(request), context)
+
+        return render(request, self.get_template(request), context)
