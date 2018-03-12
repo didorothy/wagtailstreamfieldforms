@@ -1,0 +1,12 @@
+{% extends "example/base.html" %}
+{% load wagtailcore_tags %}
+
+{% block content %}
+    <form action="{% pageurl self %}" method="POST">
+        {% csrf_token %}
+        {% for blck in self.body %}
+            {% include_block blck %}
+        {% endfor %}
+        <input type="submit" value="{{ self.submit_label }}"/>
+    </form>
+{% endblock %}

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'wagtail.contrib.modeladmin',
     'wagtail.contrib.settings',
     'wagtail.contrib.wagtailsearchpromotions',
+    'wagtail.contrib.wagtailstyleguide',
 
     'modelcluster',
     'taggit',

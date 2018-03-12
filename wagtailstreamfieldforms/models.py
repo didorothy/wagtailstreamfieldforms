@@ -118,7 +118,7 @@ class AbstractFormPage(Page):
 
     def __init__(self, *args, **kwargs):
         super(AbstractFormPage, self).__init__(*args, **kwargs)
-        if not hasattr('form_submitted_template'):
+        if not hasattr(self, 'form_submitted_template'):
             name, ext = os.path.splitext(self.template)
             self.form_submitted_template = name + '_submitted' + ext
 
@@ -181,6 +181,7 @@ class AbstractFormPage(Page):
 
     def serve(self, request, *args, **kwargs):
         '''Handles serving the Page on the front-end of the website.'''
+        print('HERE IN SERVE')
         context = self.get_context(request)
         if request.method == 'POST':
             form = context['form']

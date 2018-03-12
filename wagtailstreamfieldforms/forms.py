@@ -46,6 +46,16 @@ class BlockField(object):
         return create_field_id(opts['label'])
 
 
+class BaseForm(django.forms.Form):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('label_suffix', '')
+
+        self.user = kwargs.pop('user', None)
+        self.page = kwargs.pop('page', None)
+
+        super(BaseForm, self).__init__(*args, **kwargs)
+
+
 class FormBuilder(object):
     '''Builds a form class from a list of passed in form fields.'''
 
@@ -63,4 +73,4 @@ class FormBuilder(object):
     def get_form_class(self):
         '''Creates a Form class based on the fields passed in at initialization.'''
         # TODO: consider only creating the class on the first call an then returning the originally created class on subsequent calls to save cycles and to prevent class type conflicts.
-        return type('StreamForm', (django.forms.Form,), self.formfields)
+        return type('StreamForm', (BaseForm,), self.formfields)

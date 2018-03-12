@@ -1,0 +1,8 @@
+{% extends "example/base.html" %}
+{% load wagtailcore_tags %}
+
+{% block content %}
+    {% for blck in self.submitted_body %}
+        {% include_block blck %}
+    {% endfor %}
+{% endblock %}

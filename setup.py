@@ -8,6 +8,10 @@ install_requires = [
     'wagtail>1.13,<2',
 ]
 
+documentation_extras = [
+    'Sphinx>=1.7.1',
+]
+
 with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
     README = readme.read()
 
@@ -20,6 +24,9 @@ setup(
     packages=['wagtailstreamfieldforms'],
     include_package_data=True,
     install_requires=install_requires,
+    extras_require={
+        'docs': documentation_extras,
+    },
     license="MIT",
     description="Streamfield Forms allows you to create a form by including the form fields in the content stream of a Wagtail Page.",
     long_description=README,
