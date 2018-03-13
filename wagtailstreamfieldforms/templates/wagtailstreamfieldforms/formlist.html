@@ -1,1 +1,42 @@
-<!-- TODO -->
+{% extends "wagtailadmin/base.html" %}
+{% load i18n %}
+
+{% block extra_css %}
+<style>
+    .listing .title { text-align: left; }
+    .listing .count { text-align: center; }
+</style>
+{% endblock %}
+
+{% block titletag %}{% trans "StreamField Forms" %}{% endblock %}
+
+{% block content %}
+    {% trans "StreamField Forms" as forms_str %}
+    {% trans "Pages" as select_form_str %}
+    {% include "wagtailadmin/shared/header.html" with title=forms_str subtitle=select_form_str icon="form" %}
+
+    <div>
+        <table class="listing full-width">
+            <tr>
+                <th class="title">Page</th>
+                <th class="count">Number of Submission</th>
+            </tr>
+            {% for item in object_list %}
+            <tr>
+                <td class="title">
+                    <h2>
+                        <a href="{% url 'streamfieldforms:submissions' item.page__id %}">
+                            {{ item.page__title }}
+                        </a>
+                    </h2>
+                </td>
+                <td class="count">{{ item.count }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <div class="pagination">
+            {{ page_obj }}
+        </div>
+    </div>
+{% endblock %}

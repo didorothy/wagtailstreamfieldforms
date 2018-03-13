@@ -23,8 +23,14 @@ class Submission(models.Model):
     def __str__(self):
         return 'Submission - {0} - {1}'.format(
             self.page.title,
-            self.created.strftime('%Y-%m-%d %H:%M:%s')
+            self.created.strftime('%Y-%m-%d %H:%M:%S')
         )
+
+    def fields(self):
+        fields = []
+        for field in self.submissionfield_set.all():
+            fields.append((field.field_name, field.field_value))
+        return fields
 
 
 class SubmissionField(models.Model):

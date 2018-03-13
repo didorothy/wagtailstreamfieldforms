@@ -1,0 +1,51 @@
+{% extends "wagtailadmin/base.html" %}
+{% load i18n wagtailstreamfieldforms %}
+
+{% block extra_css %}
+<style>
+    .listing .title { text-align: left; }
+    .listing .count { text-align: center; }
+</style>
+{% endblock %}
+
+{% block titletag %}{% trans "StreamField Forms" %}{% endblock %}
+
+{% block content %}
+    {% trans "StreamField Forms" as forms_str %}
+    {% include "wagtailadmin/shared/header.html" with title=forms_str subtitle=page.title icon="form" %}
+
+    <div>
+        <table class="listing full-width">
+            <tr>
+                {% for name in field_names %}
+                <th class="{{ name | lower }}">{{ name | unslugify }}</th>
+                {% endfor %}
+            </tr>
+            {% for row in rows %}
+            <tr>
+                {% for field in row %}
+                <td>{{ field }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+
+        <div class="pagination">
+            {{ page_obj }}
+            {% if is_paginated %}
+            <ul>
+                <li class="prev">
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}" class="icon icon-arrow-left">{% trans "Previous" %}</a>
+                    {% endif %}
+                </li>
+                <li class="next">
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}" class="icon icon-arrow-right-after">{% trans "Next" %}</a>
+                    {% endif %}
+                </li>
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
