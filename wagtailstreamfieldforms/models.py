@@ -166,6 +166,7 @@ class AbstractFormPage(Page):
             sub_field.field_name = key
             sub_field.field_value = json.dumps(form.cleaned_data[key], cls=DjangoJSONEncoder)
             sub_field.save()
+        return sub
 
     def get_context(self, request, *args, **kwargs):
         '''Builds and returns the rendering context for rendering a template.'''

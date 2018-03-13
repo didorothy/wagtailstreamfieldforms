@@ -78,3 +78,5 @@ This allows for the block to specify how it is rendered and allows for overridin
     {% endblock %}
 
 Now, you should be able to run ``python manage.py makemigrations myapp``, ``python manage.py migrate``, and ``python manage.py runserver`` to begin creating and viewing your new form pages.
+
+.. note:: Currently the ``DateFormFieldBlock`` and ``DateTimeFormFieldBlock`` do not provide any date choosing mechanism and you would be required to provide that if you want it.
