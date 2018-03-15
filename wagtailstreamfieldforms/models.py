@@ -188,7 +188,6 @@ class AbstractFormPage(Page):
 
     def serve(self, request, *args, **kwargs):
         '''Handles serving the Page on the front-end of the website.'''
-        print('HERE IN SERVE')
         context = self.get_context(request)
         if request.method == 'POST':
             form = context['form']
