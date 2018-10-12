@@ -4,7 +4,7 @@ from django.utils.six import text_type
 from django.utils.text import slugify
 from unidecode import unidecode
 
-from wagtail.wagtailcore.blocks import (
+from wagtail.core.blocks import (
     BooleanBlock,
     CharBlock,
     DeclarativeSubBlocksMetaclass,

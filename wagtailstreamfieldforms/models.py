@@ -6,9 +6,9 @@ from django.contrib.auth.models import User
 from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render
 
-from wagtail.wagtailcore.blocks import ListBlock, StreamBlock, StructBlock
-from wagtail.wagtailcore.fields import StreamField
-from wagtail.wagtailcore.models import Page
+from wagtail.core.blocks import ListBlock, StreamBlock, StructBlock
+from wagtail.core.fields import StreamField
+from wagtail.core.models import Page
 
 from .blocks import FormFieldBlockMixin
 from .forms import BlockField, FormBuilder

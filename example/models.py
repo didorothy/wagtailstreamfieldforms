@@ -1,10 +1,10 @@
 from django.db import models
 
-from wagtail.wagtailadmin.edit_handlers import FieldPanel, StreamFieldPanel
-from wagtail.wagtailcore.models import Page
-from wagtail.wagtailcore.fields import StreamField
-from wagtail.wagtailcore.blocks import CharBlock, RichTextBlock
-from wagtail.wagtailimages.blocks import ImageChooserBlock
+from wagtail.admin.edit_handlers import FieldPanel, StreamFieldPanel
+from wagtail.core.models import Page
+from wagtail.core.fields import StreamField
+from wagtail.core.blocks import CharBlock, RichTextBlock
+from wagtail.images.blocks import ImageChooserBlock
 
 from wagtailstreamfieldforms.blocks import (
     SingleLineFormFieldBlock,

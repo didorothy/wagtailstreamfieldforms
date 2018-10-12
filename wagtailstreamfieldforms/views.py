@@ -4,7 +4,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import ListView
 
-from wagtail.wagtailcore.models import Page
+from wagtail.core.models import Page
 
 from .models import Submission
 

@@ -3,8 +3,8 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import ListView
 
-from wagtail.wagtailcore import hooks
-from wagtail.wagtailadmin.menu import MenuItem
+from wagtail.core import hooks
+from wagtail.admin.menu import MenuItem
 
 from .models import Submission, SubmissionField
 from . import urls

@@ -27,8 +27,8 @@ If you want to allow the end user to specify the label on the submit button or t
     # myapp.models
     from django.db import models
 
-    from wagtail.wagtailcore.blocks import CharBlock, RichTextBlock
-    from wagtail.wagtailcore.fields import StreamField
+    from wagtail.core.blocks import CharBlock, RichTextBlock
+    from wagtail.core.fields import StreamField
     from wagtailstreamfieldforms.blocks import *
     from wagtailstreamfieldforms.models import AbstractFormPage
 

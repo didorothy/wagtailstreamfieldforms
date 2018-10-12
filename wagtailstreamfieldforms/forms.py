@@ -3,7 +3,7 @@ from collections import OrderedDict
 import django.forms
 from django.utils.translation import ugettext_lazy as _
 
-from wagtail.wagtailcore.blocks import Block
+from wagtail.core.blocks import Block
 
 from .utils import create_field_id
 

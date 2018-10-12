@@ -2,7 +2,7 @@
 from django import forms
 from django.test import TestCase
 
-from wagtail.wagtailcore.blocks import StructBlock
+from wagtail.core.blocks import StructBlock
 
 from wagtailstreamfieldforms.blocks import FormFieldBlockMixin
 from wagtailstreamfieldforms.forms import FormFieldBlockRegistry, BlockField, FormBuilder

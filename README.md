@@ -11,15 +11,15 @@ Usage Notes
 Creating forms inside ``StreamField``s works like most other ``StreamField`` interactions.
 From the end user's perspective, adding form fields in a StreamField works like any other Page.
 
-To set up a Page that contains forms in a ``StreamField``, create a class that inherits from ``StreamFieldAbstractFormMixin`` and ``wagtail.wagtailforms.models.AbstractForm``.
-Any class that has ``wagtail.wagtailforms.models.AbstractForm`` as a base class will work so you can also use ``wagtail.wagtailforms.models.AbstractEmailForm``.
+To set up a Page that contains forms in a ``StreamField``, create a class that inherits from ``StreamFieldAbstractFormMixin`` and ``wagtail.contrib.forms.models.AbstractForm``.
+Any class that has ``wagtail.contrib.forms.models.AbstractForm`` as a base class will work so you can also use ``wagtail.contrib.forms.models.AbstractEmailForm``.
 Next, add one or more ``StreamField``s to the class and include ``FormFieldBlock`` as one of the blocks that can be in the stream.
 See the example below.
 
 ```python
-    from wagtail.wagtailcore.blocks import CharBlock, RichTextBlock
-    from wagtail.wagtailcore.fields import StreamField
-    from wagtail.wagtailforms.models import AbstractForm
+    from wagtail.core.blocks import CharBlock, RichTextBlock
+    from wagtail.core.fields import StreamField
+    from wagtail.contrib.forms.models import AbstractForm
 
     from streamfieldforms.blocks import FormFieldBlock
     from streamfieldforms.models import StreamFieldAbstractFormMixin

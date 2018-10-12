@@ -4,7 +4,7 @@
 import json
 
 from django.test import TestCase
-from wagtail.wagtailcore.blocks import CharBlock, ListBlock, RichTextBlock, StreamBlock, StructBlock
+from wagtail.core.blocks import CharBlock, ListBlock, RichTextBlock, StreamBlock, StructBlock
 
 from wagtailstreamfieldforms.blocks import *
 from wagtailstreamfieldforms.models import FormFieldFinder

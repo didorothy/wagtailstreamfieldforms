@@ -5,7 +5,7 @@ from wagtailstreamfieldforms import __version__
 
 install_requires = [
     'Django>=1.11,<1.12',
-    'wagtail>1.13,<2',
+    'wagtail>2,<3',
 ]
 
 documentation_extras = [
