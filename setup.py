@@ -4,8 +4,8 @@ from setuptools import setup
 from wagtailstreamfieldforms import __version__
 
 install_requires = [
-    'Django>=1.11,<1.12',
-    'wagtail>2,<3',
+    'Django>=2.0,<2.3',
+    'wagtail>=2.4,<3',
 ]
 
 documentation_extras = [

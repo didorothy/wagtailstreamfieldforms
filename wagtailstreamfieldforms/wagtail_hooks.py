@@ -12,7 +12,7 @@ from . import urls
 @hooks.register('register_admin_urls')
 def register_admin_urls():
     return [
-        url(r'^streamfieldforms/', include(urls, namespace='streamfieldforms'))
+        url(r'^streamfieldforms/', include((urls, 'wagtailstreamfieldforms'), namespace='streamfieldforms'))
     ]
 
 @hooks.register('register_admin_menu_item')
