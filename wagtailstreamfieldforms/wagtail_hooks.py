@@ -9,11 +9,13 @@ from wagtail.admin.menu import MenuItem
 from .models import Submission, SubmissionField
 from . import urls
 
+
 @hooks.register('register_admin_urls')
 def register_admin_urls():
     return [
         url(r'^streamfieldforms/', include((urls, 'wagtailstreamfieldforms'), namespace='streamfieldforms'))
     ]
+
 
 @hooks.register('register_admin_menu_item')
 def register_streamfield_forms_menu():

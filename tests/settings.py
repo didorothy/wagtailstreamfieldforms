@@ -10,17 +10,16 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'wagtail.core',
-    'wagtail.admin',
-    'wagtail.documents',
-    'wagtail.users',
-    'wagtail.images',
-    'wagtail.embeds',
-    'wagtail.search',
     'wagtail.contrib.redirects',
+    'wagtail.embeds',
     'wagtail.sites',
-    'wagtail.contrib.modeladmin',
-    'wagtail.contrib.settings',
+    'wagtail.users',
+    'wagtail.snippets',
+    'wagtail.documents',
+    'wagtail.images',
+    'wagtail.search',
+    'wagtail.admin',
+    'wagtail.core',
 
     'modelcluster',
     'taggit',
@@ -38,7 +37,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
 
-    'wagtail.core.middleware.SiteMiddleware',
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
 ]
 

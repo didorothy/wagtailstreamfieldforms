@@ -15,6 +15,7 @@ FORM_FIELD_CHOICES = (
     ('datetime', _('Date/time')),
 )
 
+
 def create_field_id(label):
     '''Converts a label to a slugified version we can use to identify the field.'''
     return str(slugify(label))

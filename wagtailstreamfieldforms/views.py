@@ -42,7 +42,7 @@ class FormSubmissionsListView(ListView):
         return Submission.objects.select_related().filter(page=self.page_id).order_by('-created')
 
     def get_context_data(self, *args, **kwargs):
-        data = super(FormSubmissionsListView, self).get_context_data(*args,**kwargs)
+        data = super(FormSubmissionsListView, self).get_context_data(*args, **kwargs)
         data['page'] = self.page
         field_names = ['created', 'user']
         data_dicts = []

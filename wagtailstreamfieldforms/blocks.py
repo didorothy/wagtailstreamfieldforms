@@ -1,8 +1,6 @@
 import django.forms
 from django.utils.html import format_html, format_html_join
-from django.utils.six import text_type
 from django.utils.text import slugify
-from unidecode import unidecode
 
 from wagtail.core.blocks import (
     BooleanBlock,
@@ -21,7 +19,8 @@ from .utils import create_field_id
 class FormFieldBlockMixin(object, metaclass=DeclarativeSubBlocksMetaclass):
     '''Every Block that can be a form field in a StreamField must use this mixin.
 
-    Inheriting from this class allows for the block to be identified and for the block to generate the needed information for the form.
+    Inheriting from this class allows for the block to be identified and for
+    the block to generate the needed information for the form.
     '''
     label = CharBlock()
     required = BooleanBlock(default=False, required=False)
@@ -55,7 +54,12 @@ class FormFieldBlockMixin(object, metaclass=DeclarativeSubBlocksMetaclass):
             form = {
                 self.clean_name(value): self.create_field(value)
             }
-        return format_html('<div class="{}">{}{}</div>', self.__class__.__name__.lower(), form[self.clean_name(value)].label_tag(), form[self.clean_name(value)])
+        return format_html(
+            '<div class="{}">{}{}</div>',
+            self.__class__.__name__.lower(),
+            form[self.clean_name(value)].label_tag(),
+            form[self.clean_name(value)]
+        )
 
     class Meta:
         icon = 'form'
@@ -154,7 +158,12 @@ class CheckboxFormFieldBlock(FormFieldBlockMixin, StructBlock):
             form = {
                 self.clean_name(value): self.create_field(value)
             }
-        return format_html('<div class="{}">{}{}</div>', self.__class__.__name__.lower(), form[self.clean_name(value)], form[self.clean_name(value)].label_tag())
+        return format_html(
+            '<div class="{}">{}{}</div>',
+            self.__class__.__name__.lower(),
+            form[self.clean_name(value)],
+            form[self.clean_name(value)].label_tag()
+        )
 
 
 class FieldChoiceBlock(StructBlock):

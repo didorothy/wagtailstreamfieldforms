@@ -1,2 +1,2 @@
-django>=2.0<2.3
-wagtail>=2.4
+django>=2.2<2.3
+wagtail>=2.13<2.14

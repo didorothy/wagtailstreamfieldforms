@@ -2,21 +2,21 @@ from collections import OrderedDict
 
 import django.forms
 from django.utils.translation import ugettext_lazy as _
-
 from wagtail.core.blocks import Block
 
 from .utils import create_field_id
+
 
 class FormFieldBlockRegistry(object):
     '''Registry holding a mapping of field names to Blocks that represent those fields.'''
     def __init__(self):
         self.field_types = {}
 
-    def register(self, name:str, block:Block=None):
+    def register(self, name: str, block: Block = None):
         '''Register a new form field Block class.'''
         if name in self.field_types:
             raise ValueError("Duplicate form field block name.")
-        if block == None:
+        if block is None:
             def wrapper(cls):
                 self.field_types[name] = cls
                 return cls
@@ -72,5 +72,7 @@ class FormBuilder(object):
 
     def get_form_class(self):
         '''Creates a Form class based on the fields passed in at initialization.'''
-        # TODO: consider only creating the class on the first call an then returning the originally created class on subsequent calls to save cycles and to prevent class type conflicts.
+        # TODO: consider only creating the class on the first call an then
+        # returning the originally created class on subsequent calls to save
+        # cycles and to prevent class type conflicts.
         return type('StreamForm', (BaseForm,), self.formfields)

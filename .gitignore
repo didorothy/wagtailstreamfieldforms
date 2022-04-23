@@ -1,6 +1,8 @@
 __pycache__
+.tox/
 htmlcov/
 docs/_build/
+wagtailstreamfieldforms.egg-info/
 .coverage
 .vscode
 *.pyc
